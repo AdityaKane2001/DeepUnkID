@@ -5,6 +5,9 @@ import tensorflow as tf
 from keras.backend import set_session
 import numpy as np
 import random as rn
+import random
+import glob
+import os
 
 SEED = 20190222
 np.random.seed(SEED)
@@ -33,6 +36,42 @@ def load_data(dataset):
     df = pd.DataFrame([texts, labels]).T
     df.columns = ['text', 'label']
     return df, partition_to_n_row
+
+
+def load_20ng():
+    ALL_SUBSETS = ['alt.atheism', 'comp.graphics', 'comp.os.ms-windows.misc', 'comp.sys.ibm.pc.hardware', 'comp.sys.mac.hardware', 'comp.windows.x', 'misc.forsale', 'rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey', 'sci.crypt', 'sci.electronics', 'sci.med', 'sci.space', 'soc.religion.christian', 'talk.politics.guns', 'talk.politics.mideast', 'talk.politics.misc', 'talk.religion.misc']
+    random.seed(42)
+    random.shuffle(ALL_SUBSETS)
+
+    def readfile(filepath):
+        with open(filepath, 'rb') as file:
+            data = str(file.read()).replace('\\n', ' ').replace('\\r', ' ')
+        return data
+
+    def get_all_20ng(basepath):
+        X = []
+        y = []
+        for subset_idx, subset in enumerate(ALL_SUBSETS):
+            subset_globstr = os.path.join(basepath, subset, "*")
+            all_files = glob.glob(subset_globstr)
+            for filepath in all_files:
+                X.append(readfile(filepath))
+                y.append(subset)
+        return X, y
+
+    X, y = get_all_20ng("/home/airl-gpu3/aditya_ws/DeepUnkID/20ng")
+    df = pd.DataFrame([X, y]).T
+
+    df.columns = ['text', 'label']
+    df = df.sample(frac=1).reset_index(drop=True)
+    print(df)
+    total = len(y)
+    train, valid, test = int(0.6 * total), int(0.1 * total), int(total - 0.7 * total)
+    partition_to_n_row = {"train" : train, "valid": valid, "test": test}
+    return df, partition_to_n_row
+
+    
+
 
 def get_score(cm):
     fs = []

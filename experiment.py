@@ -26,13 +26,18 @@ set_allow_growth(device="1")
 
 dataset = sys.argv[1]
 proportion = int(sys.argv[2])
-embedding_path = '/data/disk1/sharing/pretrained_embedding/glove/'
+embedding_path = './'
 EMBEDDING_FILE = os.path.join(embedding_path, 'glove.6B.300d.txt')
 MAX_SEQ_LEN = None
 MAX_NUM_WORDS = 10000
 EMBEDDING_DIM = 300
 
-df, partition_to_n_row = load_data(dataset)
+df, partition_to_n_row = load_20ng()
+
+# print(df)
+# raise ValueError()
+
+print(partition_to_n_row)
 
 
 df['content_words'] = df['text'].apply(lambda s: word_tokenize(s))
@@ -126,7 +131,7 @@ test_data = (X_test, y_test_mask)
 ## If you want to plot the model
 # model = BiLSTM_LMCL(MAX_SEQ_LEN, MAX_FEATURES, EMBEDDING_DIM, n_class_seen, 'img/model.png', embedding_matrix)
 model = BiLSTM_LMCL(MAX_SEQ_LEN, MAX_FEATURES, EMBEDDING_DIM, n_class_seen, None, embedding_matrix)
-history = model.fit(train_data[0], train_data[1], epochs=200, batch_size=256, 
+history = model.fit(train_data[0], train_data[1], epochs=2, batch_size=256, 
                     validation_data=valid_data, shuffle=True, verbose=1, callbacks=callbacks_list)
                     
 
@@ -150,6 +155,8 @@ df_seen['unseen'] = 0
 y_pred = df_seen.idxmax(axis=1)
 y_pred[y_pred_lof[y_pred_lof==-1].index]='unseen'
 cm = confusion_matrix(test_data[1], y_pred, classes)
+
+print(y_pred, test_data[1])
 
 f, f_seen, f_unseen = get_score(cm)
 plot_confusion_matrix(cm, classes, normalize=False, figsize=(9, 6),
