@@ -1,10 +1,10 @@
-from keras import backend as K
-from keras.models import Sequential, Model
-from keras.layers import *
-from keras.layers.core import Lambda
-from keras.constraints import unit_norm
-from keras.optimizers import Adam
-from keras.utils import plot_model
+from tensorflow.keras import backend as K
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import *
+from tensorflow.keras.layers import Lambda
+from tensorflow.keras.constraints import unit_norm
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.utils import plot_model
 
 def large_margin_cosine_loss(y_true, y_pred, scale=30, margin=0.35):
     y_pred = y_true * (y_pred - margin) + (1 - y_true) * y_pred

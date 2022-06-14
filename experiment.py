@@ -6,23 +6,25 @@ import numpy as np
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import to_categorical
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 # Modeling
 from models import BiLSTM_LMCL
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.models import Model
-from keras import backend as K
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.models import Model
+from tensorflow.keras import backend as K
 
 # Evaluation
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import LocalOutlierFactor
-
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 # GPU setting
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
-set_allow_growth(device="1")
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# set_allow_growth(device="0")
 
 dataset = sys.argv[1]
 proportion = int(sys.argv[2])
@@ -131,6 +133,10 @@ test_data = (X_test, y_test_mask)
 ## If you want to plot the model
 # model = BiLSTM_LMCL(MAX_SEQ_LEN, MAX_FEATURES, EMBEDDING_DIM, n_class_seen, 'img/model.png', embedding_matrix)
 model = BiLSTM_LMCL(MAX_SEQ_LEN, MAX_FEATURES, EMBEDDING_DIM, n_class_seen, None, embedding_matrix)
+
+print(np.any(np.isnan(train_data[0])))
+print(train_data[1])
+
 history = model.fit(train_data[0], train_data[1], epochs=2, batch_size=256, 
                     validation_data=valid_data, shuffle=True, verbose=1, callbacks=callbacks_list)
                     

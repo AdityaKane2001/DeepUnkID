@@ -2,7 +2,7 @@ import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from keras.backend import set_session
+# from tensorflow.keras.backend import set_session
 import numpy as np
 import random as rn
 import random
@@ -12,7 +12,7 @@ import os
 SEED = 20190222
 np.random.seed(SEED)
 rn.seed(SEED)
-tf.set_random_seed(SEED)
+tf.random.set_seed(SEED)
 
 def set_allow_growth(device="1"):
     config = tf.ConfigProto()
@@ -59,7 +59,7 @@ def load_20ng():
                 y.append(subset)
         return X, y
 
-    X, y = get_all_20ng("/home/airl-gpu3/aditya_ws/DeepUnkID/20ng")
+    X, y = get_all_20ng("/home/user/aditya_ws/DeepUnkID/20ng")
     df = pd.DataFrame([X, y]).T
 
     df.columns = ['text', 'label']
